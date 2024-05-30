@@ -1,0 +1,15 @@
+{
+  "name": "project-feet",
+  "version": "1.0.0",
+  "description": "An attempt to allow more possible input to the computer, without creating more work for the user's hands",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "icecreamsandwch",
+  "license": "MIT",
+  "dependencies": {
+    "robotjs": "^0.6.0",
+    "serialport": "^12.0.0"
+  }
+}
