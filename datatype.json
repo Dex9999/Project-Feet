@@ -1,0 +1,23 @@
+{
+    "key": {
+        "key": "e",
+        "toggle": false,
+        "modifiers": [
+            "control",
+            "shift"
+        ]
+    },
+
+    "mouse": {
+        "button": "left/right/middle/doubleLeft/null",
+        "drag": false,
+        "newMovement": {
+            "x": 5,
+            "y": -5
+        },
+        "scroll": {
+            "x": 10,
+            "y": 15
+        }
+    }
+}
