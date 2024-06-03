@@ -1,5 +1,6 @@
-{
-    "key": {
+[
+    {
+        "type": "key",
         "key": "e",
         "toggle": false,
         "modifiers": [
@@ -7,8 +8,8 @@
             "shift"
         ]
     },
-
-    "mouse": {
+    {
+        "type": "mouse",
         "button": "left/right/middle/doubleLeft/null",
         "drag": false,
         "newMovement": {
@@ -20,4 +21,4 @@
             "y": 15
         }
     }
-}
+]
