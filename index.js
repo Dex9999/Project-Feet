@@ -7,15 +7,9 @@ const port = new SerialPort({
     baudRate: 9600, // change later if too slow
 })
 
-// port.on('open', () => {
-//     setInterval(() => port.write('active!'), 3000);
-// });
-//TODO fix data recieving lmao
 let partial = "";
 port.on('data', (data) => {
-    // console.log(`Received serial data: ${data.toString()}`);
     partial += data.toString();
-    // console.log(partial);
     const dataParts = partial.split("*");
     if (dataParts.length > 1) {
         const fullData = dataParts.shift();
@@ -24,15 +18,49 @@ port.on('data', (data) => {
             processData(fullData);
         } // else ignore, data is corrupted
     }
-
-    // console.log(x,y)
-    // curr = robot.getMousePos();
-    // robot.moveMouseSmooth(curr.x+x,curr.y+y)
 });
+
 function processData(data){
-    console.log(data);
+    try{
+        let json = JSON.parse(data);
+        console.log(json);
+        if(json.type == "mouse"){
+            let x = json.move.x;
+            let y = json.move.y;
+
+            if(x>100 || x < 0){
+                x = 0;
+            } else {
+                x = mapNumber(x, 0, 20, -20, 20);
+            }
+            if(y>100 || y < 0){
+                y = 0;
+            } else {
+                y = mapNumber(y, 0, 20, -20, 20);
+            }
+
+            // moveAbsolute(x,y);
+            moveMouse(x,y);
+        }
+        // if(json.type = "key"){
+
+        // }
+    } catch(err){
+        console.log("tried to parse broken data", err)
+    }
 }
+
+function moveAbsolute(x,y){
+    let screenSize = robot.getScreenSize();
+    robot.moveMouse(mapNumber(x, -20, 20, 0, screenSize.width),mapNumber(y, -20, 20, 0, screenSize.height));
+}
+
 function moveMouse(x, y){
     let curr = robot.getMousePos();
-    robot.moveMouseSmooth(curr.x+x, curr.y+y);
+    robot.moveMouse(curr.x+x, curr.y+y);
+}
+
+
+function mapNumber (num, in_min, in_max, out_min, out_max) {
+    return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

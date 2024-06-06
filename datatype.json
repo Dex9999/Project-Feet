@@ -12,7 +12,7 @@
         "type": "mouse",
         "button": "left/right/middle/doubleLeft/null",
         "drag": false,
-        "newMovement": {
+        "move": {
             "x": 5,
             "y": -5
         },

@@ -1,39 +1,52 @@
 //ultra sonic sensors on front/side to see xy of foot
 //gyro on foot to allow pedal-like movement? (or light sensor)
 #include <Arduino_JSON.h>
-const int trigPin = 9;
-const int echoPin = 10;
+const int xTrigPin = 5;
+const int xEchoPin = 6;
+const int yTrigPin = 9;
+const int yEchoPin = 10;
 
-long duration;
-int distance;
+float xduration;
+int xdistance;
+float yduration;
+int ydistance;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(trigPin, OUTPUT); // trigPin
-  pinMode(echoPin, INPUT); // echoPin
+  pinMode(yTrigPin, OUTPUT); // trigPin for y axis
+  pinMode(yEchoPin, INPUT); // echoPin for y axis
+  pinMode(xTrigPin, OUTPUT); // trigPin for x axis
+  pinMode(xEchoPin, INPUT); // echoPin for x axis
 }
 
-const char input[] = "{\"type\":\"mouse\",\"button\":\"left/right/middle/doubleLeft/null\",\"drag\":false,\"newMovement\":{\"x\":5,\"y\":-5},\"scroll\":{\"x\":10,\"y\":15}}";
 JSONVar data;
 JSONVar moveJson;
-void loop() {
- 
 
-  // Clear trigPin
-  digitalWrite(trigPin, LOW);
+void loop() {
+  // clear trigPin
+  digitalWrite(xTrigPin, LOW);
+  digitalWrite(yTrigPin, LOW);
   delayMicroseconds(2);
-  // Sets trigPin to HIGH for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
+  // set trigPin to HIGH for 10 micro seconds
+  digitalWrite(xTrigPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  // Reads echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
+  digitalWrite(xTrigPin, LOW);
+  // read echoPin, returns the soundwave travel time in microseconds
+  xduration = pulseIn(xEchoPin, HIGH);
+  // repeat with y
+  digitalWrite(yTrigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(yTrigPin, LOW);
+  yduration = pulseIn(yEchoPin, HIGH);
+
   // multiply by speed of sound (340m/s 34cm/ms) and divide by two as the sensor
   // measures the time to travel to object and back
-  distance = duration * 0.034 / 2;
+  xdistance = xduration * 0.034 / 2.000000;
+  ydistance = yduration * 0.034 / 2.000000;
+  
   data["type"] = "mouse";
-  moveJson["x"] = distance;
-  moveJson["y"] = 0;
-  data["newMovement"] = moveJson;
+  moveJson["x"] = xdistance;
+  moveJson["y"] = ydistance;
+  data["move"] = moveJson;
   Serial.print("*" + JSON.stringify(data) + "*");
 }
