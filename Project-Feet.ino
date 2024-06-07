@@ -1,6 +1,8 @@
 //ultra sonic sensors on front/side to see xy of foot
 //gyro on foot to allow pedal-like movement? (or light sensor)
 #include <Arduino_JSON.h>
+#include <Servo.h>
+
 const int xTrigPin = 5;
 const int xEchoPin = 6;
 const int yTrigPin = 9;
@@ -11,12 +13,15 @@ int xdistance;
 float yduration;
 int ydistance;
 
+Servo servoY;
+
 void setup() {
   Serial.begin(9600);
   pinMode(yTrigPin, OUTPUT); // trigPin for y axis
   pinMode(yEchoPin, INPUT); // echoPin for y axis
   pinMode(xTrigPin, OUTPUT); // trigPin for x axis
   pinMode(xEchoPin, INPUT); // echoPin for x axis
+  servoY.attach(11, 900, 2100);
 }
 
 JSONVar data;
@@ -46,6 +51,7 @@ void loop() {
   
   data["type"] = "mouse";
   moveJson["x"] = xdistance;
+  // servoY.write(map(ydistance, 0, 120, 0, 180)); // not workiongs
   moveJson["y"] = ydistance;
   data["move"] = moveJson;
   Serial.print("*" + JSON.stringify(data) + "*");
