@@ -3,16 +3,20 @@
 #include <Arduino_JSON.h>
 #include <Servo.h>
 
-const int xTrigPin = 5;
-const int xEchoPin = 6;
-const int yTrigPin = 9;
+const int xTrigPin = 3;
+const int xEchoPin = 5;
+const int yTrigPin = 11;
 const int yEchoPin = 10;
+const int xServoPin = 6;
+const int yServoPin = 9;
+
 
 float xduration;
 int xdistance;
 float yduration;
 int ydistance;
 
+Servo servoX;
 Servo servoY;
 
 void setup() {
@@ -21,7 +25,10 @@ void setup() {
   pinMode(yEchoPin, INPUT); // echoPin for y axis
   pinMode(xTrigPin, OUTPUT); // trigPin for x axis
   pinMode(xEchoPin, INPUT); // echoPin for x axis
-  servoY.attach(11, 900, 2100);
+  servoX.attach(xServoPin, 900, 2100);
+  servoY.attach(yServoPin, 900, 2100);
+  servoX.write(130);
+  servoY.write(60);
 }
 
 JSONVar data;
@@ -55,4 +62,13 @@ void loop() {
   moveJson["y"] = ydistance;
   data["move"] = moveJson;
   Serial.print("*" + JSON.stringify(data) + "*");
+
+  // if(abs(xdistance-14) > abs(ydistance-14)){
+    // y is 0-120 l-r
+    servoY.write(map(xdistance,3,25,0, 120));
+  // } else{
+    // x is 50-180 d-u
+    servoX.write(map(ydistance,3,25,180, 50));
+  // }
+  
 }
