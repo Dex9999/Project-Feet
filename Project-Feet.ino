@@ -10,14 +10,20 @@ const int yEchoPin = 10;
 const int xServoPin = 6;
 const int yServoPin = 9;
 
+const int xMidpoint = 130;
+const int yMidpoint = 60;
 
 float xduration;
-int xdistance;
+float xdistance;
 float yduration;
-int ydistance;
+float ydistance;
+
+float cxDistance;
+float cyDistance;
 
 Servo servoX;
 Servo servoY;
+
 
 void setup() {
   Serial.begin(9600);
@@ -27,8 +33,8 @@ void setup() {
   pinMode(xEchoPin, INPUT); // echoPin for x axis
   servoX.attach(xServoPin, 900, 2100);
   servoY.attach(yServoPin, 900, 2100);
-  servoX.write(130);
-  servoY.write(60);
+  servoX.write(xMidpoint);
+  servoY.write(yMidpoint);
 }
 
 JSONVar data;
@@ -53,22 +59,34 @@ void loop() {
 
   // multiply by speed of sound (340m/s 34cm/ms) and divide by two as the sensor
   // measures the time to travel to object and back
-  xdistance = xduration * 0.034 / 2.000000;
-  ydistance = yduration * 0.034 / 2.000000;
   
+  cxDistance = xduration * 0.034 / 2.000000;
+  cyDistance = yduration * 0.034 / 2.000000;
+
   data["type"] = "mouse";
+
+  if(cxDistance > 0 && cxDistance <= 25){
+    xdistance = cos(radians(xMidpoint-servoX.read()))*cxDistance;
+  } else {
+    // if nothing seen reset to midpoint distance
+    xdistance = 14;
+  }
   moveJson["x"] = xdistance;
-  // servoY.write(map(ydistance, 0, 120, 0, 180)); // not workiongs
+  // y is 0-120 l-r
+  servoY.write(map(xdistance,3,25,0, 120));
+
+  if(cyDistance > 0 && cyDistance <= 25){
+    ydistance = cos(radians(yMidpoint-servoY.read()))*cyDistance;
+  } else {
+    // if nothing seen reset to midpoint distance
+    ydistance = 14;
+  }
   moveJson["y"] = ydistance;
+  // x is 50-180 d-u
+  servoX.write(map(ydistance,3,25,180, 60));
+  
+  
   data["move"] = moveJson;
   Serial.print("*" + JSON.stringify(data) + "*");
-
-  // if(abs(xdistance-14) > abs(ydistance-14)){
-    // y is 0-120 l-r
-    servoY.write(map(xdistance,3,25,0, 120));
-  // } else{
-    // x is 50-180 d-u
-    servoX.write(map(ydistance,3,25,180, 50));
-  // }
   
 }

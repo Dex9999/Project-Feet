@@ -23,7 +23,7 @@ port.on('data', (data) => {
 function processData(data){
     try{
         let json = JSON.parse(data);
-        console.log(json);
+        // console.log(json);
         if(json.type == "mouse"){
             let x = json.move.x;
             let y = json.move.y;
@@ -31,12 +31,12 @@ function processData(data){
             if(x>100 || x < 0){
                 x = 0;
             } else {
-                x = mapNumber(x, 0, 20, -20, 20);
+                x = mapNumber(x, 8, 20, -20, 20);
             }
             if(y>100 || y < 0){
                 y = 0;
             } else {
-                y = mapNumber(y, 0, 20, -20, 20);
+                y = mapNumber(y, 8, 20, -20, 20);
             }
 
             // moveAbsolute(x,y);
@@ -56,6 +56,7 @@ function moveAbsolute(x,y){
 }
 
 function moveMouse(x, y){
+    console.log(x,y)
     let curr = robot.getMousePos();
     robot.moveMouse(curr.x+x, curr.y+y);
 }
