@@ -19,6 +19,7 @@ port.on('data', (data) => {
         } // else ignore, data is corrupted
     }
 });
+let zeroCounter = 0;
 
 function processData(data){
     try{
@@ -37,6 +38,17 @@ function processData(data){
                 y = 0;
             } else {
                 y = mapNumber(y, 8, 20, -20, 20);
+            }
+
+            if (zeroCounter >= 3 && x != 0 || y != 0) {
+                zeroCounter = 0; // intentional "click"
+                // robot.mouseClick(); // rn clicks almost all the time :sob:
+            }
+
+            if (x === 0 && y === 0) {
+                zeroCounter++;
+            } else {
+                zeroCounter = 0;
             }
 
             // moveAbsolute(x,y);
