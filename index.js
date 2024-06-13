@@ -42,10 +42,10 @@ function processData(data){
 
             if (zeroCounter >= 3 && x != 0 || y != 0) {
                 zeroCounter = 0; // intentional "click"
-                // robot.mouseClick(); // rn clicks almost all the time :sob:
+                robot.mouseClick(); // rn clicks almost all the time :sob:
             }
 
-            if (x === 0 && y === 0) {
+            if (x === 0.0 && y === 0.0) {
                 zeroCounter++;
             } else {
                 zeroCounter = 0;

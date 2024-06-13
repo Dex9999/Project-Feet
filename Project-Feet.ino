@@ -65,7 +65,7 @@ void loop() {
 
   data["type"] = "mouse";
 
-  if(cxDistance > 0 && cxDistance <= 25){
+  if(cxDistance > 0 && cxDistance <= 30){
     xdistance = cos(radians(xMidpoint-servoX.read()))*cxDistance;
   } else {
     // if nothing seen reset to midpoint distance
@@ -73,9 +73,9 @@ void loop() {
   }
   moveJson["x"] = xdistance;
   // y is 0-120 l-r
-  servoY.write(map(xdistance,3,25,0, 120));
+  servoY.write(map(xdistance,3,30,0, 140));
 
-  if(cyDistance > 0 && cyDistance <= 25){
+  if(cyDistance > 0 && cyDistance <= 30){
     ydistance = cos(radians(yMidpoint-servoY.read()))*cyDistance;
   } else {
     // if nothing seen reset to midpoint distance
@@ -83,7 +83,7 @@ void loop() {
   }
   moveJson["y"] = ydistance;
   // x is 50-180 d-u
-  servoX.write(map(ydistance,3,25,180, 60));
+  servoX.write(map(ydistance,3,30,180, 40));
   
   
   data["move"] = moveJson;
