@@ -3,20 +3,25 @@
 // try to fix regular tracking?
 const { SerialPort } = require('serialport');
 let x,y, curr;
-// Create a port
 const port = new SerialPort({
     path: 'COM4',
     baudRate: 9600, // change later if too slow
 })
-
+let setup = true;
 let partial = "";
 port.on('data', (data) => {
+    if (setup) {
+        console.log(data.toString()); 
+    } 
+
     partial += data.toString();
     const dataParts = partial.split("*");
     if (dataParts.length > 1) {
+        
         const fullData = dataParts.shift();
         partial = dataParts.join("*");
         if(fullData.startsWith("{") && fullData.endsWith("}")){
+            setup = false;
             processData(fullData);
         } // else ignore, data is corrupted
     }
@@ -30,14 +35,14 @@ function processData(data){
     try{
         let json = JSON.parse(data);
 
-        let x = json.move.x;
-        let y = json.move.y;
+        let x = json.move.x || 0;
+        let y = json.move.y || 0;
         mode = json["type"];
     
         if (mode === 'mouse') {
             mouseMode(x, y);
-        } else if (mode === 'dpad') {
-            dpadMode(x, y);
+        } else if (mode === 'key') {
+            keyMode(json.key, json.toggle==false);
         } else if (mode === 'pedal') {
             pedalMode(y);
         }
@@ -46,10 +51,17 @@ function processData(data){
         console.log("tried to parse broken data", err)
     }
 }
+let lastKey = "w";
+function keyMode(key) {
+    // robot.keyToggle(key, "down");
+    // robot.keyToggle(lastKey, "up");
+    lastKey = key;
+    console.log(key);
+}
 
 // https://ledwan.itch.io/wasd
 // https://shellshock.io/
-function handleDpadMode(x, y) {
+function dpadMode(x, y) {
     // atan2 to figure out coordinates and therefore quadrant (direction)
     // from the x and y distances given (and then convert back to degrees)
     // + 180 to convert -180-180 to 0-360, /45 to split into the 8 fragments
@@ -85,17 +97,20 @@ function handleDpadMode(x, y) {
 // https://kodub.itch.io/polytrack
 function pedalMode(y){
     let threshold = 10;
-    if(y < threshold){
-        console.log("w")//;robot.keyToggle("w", "down");
-    } /*else if (y > threshold-5){
-        robot.keyTap("w"); // should alternate between pressed and not, therefore half speed
-    } */else {
+    if(y < threshold-5){
+        console.log("w half")
+        //;robot.keyToggle("w", "down");
+    } else if (y < threshold){
+        console.log("w")
+        // robot.keyTap("w");// should alternate between pressed and not, therefore half speed
+    } else {
         //robot.keyToggle("w", "up")
         console.log("up");
     }
 }
 
 function mouseMode(x,y){
+    console.log(x,y);
     if(x>100 || x < 0){
         x = 0;
     } else {
@@ -128,7 +143,7 @@ function moveAbsolute(x,y){
 }
 
 function moveMouse(x, y){
-    console.log(x,y)
+    // console.log(x,y)
     // let curr = robot.getMousePos();
     // robot.moveMouse(curr.x+x, curr.y+y);
 }
