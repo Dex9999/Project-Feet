@@ -71,14 +71,14 @@ void loop() {
 
     if (digitalRead(buttonPin) == LOW) {
       delay(200);
-      currentMode = (currentMode + 1) % 3;  // cycle  modes (0 = servo, 1 = no servo, 2 = pedal)
+      currentMode = (currentMode + 1) % 2;  // cycle  modes (0 = servo, 1 = no servo, 2 = pedal)
     }
 
     if (currentMode == 0) {
       servoTrack();
-    } else if (currentMode == 1) {
+    } else if (currentMode == 1)/* {
       readSensorsOnly();
-    } else if (currentMode == 2) {
+    } else if (currentMode == 2) */{
       pedalMode();
     }
   }
@@ -95,6 +95,7 @@ void pedalMode() {
   data["type"] = "pedal";
   moveJson["y"] = ydistance;
   data["move"] = moveJson;
+  data["threshold"] = 
   Serial.print("*" + JSON.stringify(data) + "*");
 }
 

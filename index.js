@@ -30,7 +30,7 @@ port.on('data', (data) => {
 let zeroCounter = 0;
 let mode = 'mouse'; // modes: 'mouse', 'dpad', 'pedal'
 
-    
+let lastMode;
 function processData(data){
     try{
         let json = JSON.parse(data);
@@ -38,11 +38,15 @@ function processData(data){
         let x = json.move.x || 0;
         let y = json.move.y || 0;
         mode = json["type"];
+        if(lastMode !== mode){
+            robot.keyToggle(lastKey, "up");
+        }
+        lastMode = mode;
     
         if (mode === 'mouse') {
             mouseMode(x, y);
         } else if (mode === 'key') {
-            keyMode(json.key, json.toggle==false);
+            keyMode(json.key);
         } else if (mode === 'pedal') {
             pedalMode(y);
         }
@@ -98,6 +102,7 @@ function dpadMode(x, y) {
 // https://kermel.itch.io/drumsss
 // https://kodub.itch.io/polytrack
 function pedalMode(y){
+    console.log(y);
     let threshold = 10;
     if(y < threshold-5){
         console.log("w half");
@@ -112,28 +117,28 @@ function pedalMode(y){
 }
 
 function mouseMode(x,y){
-    console.log(x,y);
-    if(x>100 || x < 0){
-        x = 0;
-    } else {
-        // x = mapNumber(x, 8, 20, -20, 20);
-    }
-    if(y>100 || y < 0){
-        y = 0;
-    } else {
-        // y = mapNumber(y, 8, 20, -20, 20);
-    }
+    // console.log(x,y);
+    // if(x>100 || x < 0){
+    //     x = 0;
+    // } else {
+    //     // x = mapNumber(x, 8, 20, -20, 20);
+    // }
+    // if(y>100 || y < 0){
+    //     y = 0;
+    // } else {
+    //     // y = mapNumber(y, 8, 20, -20, 20);
+    // }
 
-    if (zeroCounter >= 3 && x != 0 || y != 0) {
-        zeroCounter = 0; // intentional "click"
-        robot.mouseClick(); // rn clicks almost all the time :sob:
-    }
+    // if (zeroCounter >= 3 && x != 0 || y != 0) {
+    //     zeroCounter = 0; // intentional "click"
+    //     // robot.mouseClick(); // rn clicks almost all the time :sob:
+    // }
 
-    if (x === 0.0 && y === 0.0) {
-        zeroCounter++;
-    } else {
-        zeroCounter = 0;
-    }
+    // if (x === 0.0 && y === 0.0) {
+    //     zeroCounter++;
+    // } else {
+    //     zeroCounter = 0;
+    // }
 
     // moveAbsolute(x,y);
     moveMouse(x,y);
@@ -145,7 +150,7 @@ function moveAbsolute(x,y){
 }
 
 function moveMouse(x, y){
-    // console.log(x,y)
+    console.log(x,y)
     let curr = robot.getMousePos();
     robot.moveMouse(curr.x+x, curr.y+y);
 }
