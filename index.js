@@ -1,10 +1,11 @@
 // TODO servo alternate power source battery so less jiggle!
-var robot = require("robotjs");
+// var robot = require("robotjs");
+// try to fix regular tracking?
 const { SerialPort } = require('serialport');
 let x,y, curr;
 // Create a port
 const port = new SerialPort({
-    path: '/dev/ttyACM0',
+    path: 'COM4',
     baudRate: 9600, // change later if too slow
 })
 
@@ -20,6 +21,7 @@ port.on('data', (data) => {
         } // else ignore, data is corrupted
     }
 });
+
 let zeroCounter = 0;
 let mode = 'mouse'; // modes: 'mouse', 'dpad', 'pedal'
 
@@ -30,6 +32,7 @@ function processData(data){
 
         let x = json.move.x;
         let y = json.move.y;
+        mode = json["type"];
     
         if (mode === 'mouse') {
             mouseMode(x, y);
@@ -68,10 +71,10 @@ function handleDpadMode(x, y) {
 
     ['w', 'a', 's', 'd'].forEach(key => {
         if (activeDirections.includes(key) && !dpadKeys[key]) {
-            robot.keyToggle(key, 'down');
+            console.log(key + " down");// robot.keyToggle(key, 'down');
             dpadKeys[key] = true;
         } else if (!activeDirections.includes(key) && dpadKeys[key]) {
-            robot.keyToggle(key, 'up');
+            console.log(key + " down");//robot.keyToggle(key, 'up');
             dpadKeys[key] = false;
         }
     });
@@ -81,13 +84,14 @@ function handleDpadMode(x, y) {
 // https://kermel.itch.io/drumsss
 // https://kodub.itch.io/polytrack
 function pedalMode(y){
-    let threshold = 15;
-    if(y > threshold){
-        robot.keyToggle("w", "down");
-    } else if (y > threshold-5){
+    let threshold = 10;
+    if(y < threshold){
+        console.log("w")//;robot.keyToggle("w", "down");
+    } /*else if (y > threshold-5){
         robot.keyTap("w"); // should alternate between pressed and not, therefore half speed
-    } else {
-        robot.keyToggle("w", "up")
+    } */else {
+        //robot.keyToggle("w", "up")
+        console.log("up");
     }
 }
 
@@ -95,17 +99,17 @@ function mouseMode(x,y){
     if(x>100 || x < 0){
         x = 0;
     } else {
-        x = mapNumber(x, 8, 20, -20, 20);
+        // x = mapNumber(x, 8, 20, -20, 20);
     }
     if(y>100 || y < 0){
         y = 0;
     } else {
-        y = mapNumber(y, 8, 20, -20, 20);
+        // y = mapNumber(y, 8, 20, -20, 20);
     }
 
     if (zeroCounter >= 3 && x != 0 || y != 0) {
         zeroCounter = 0; // intentional "click"
-        robot.mouseClick(); // rn clicks almost all the time :sob:
+        // robot.mouseClick(); // rn clicks almost all the time :sob:
     }
 
     if (x === 0.0 && y === 0.0) {
@@ -119,14 +123,14 @@ function mouseMode(x,y){
 }
 // deprecated because it wasn't useful
 function moveAbsolute(x,y){
-    let screenSize = robot.getScreenSize();
-    robot.moveMouse(mapNumber(x, -20, 20, 0, screenSize.width),mapNumber(y, -20, 20, 0, screenSize.height));
+    // let screenSize = robot.getScreenSize();
+    // robot.moveMouse(mapNumber(x, -20, 20, 0, screenSize.width),mapNumber(y, -20, 20, 0, screenSize.height));
 }
 
 function moveMouse(x, y){
     console.log(x,y)
-    let curr = robot.getMousePos();
-    robot.moveMouse(curr.x+x, curr.y+y);
+    // let curr = robot.getMousePos();
+    // robot.moveMouse(curr.x+x, curr.y+y);
 }
 
 function mapNumber (num, in_min, in_max, out_min, out_max) {
